@@ -20,12 +20,4 @@ class WaterReportInput(LocationInput):
 
 
 class VoteInput(BaseModel):
-    session_id: str = Field(min_length=36, max_length=36)
-    direction: int = Field(ge=-1, le=1)
-
-    @field_validator("direction")
-    @classmethod
-    def valid_direction(cls, value: int) -> int:
-        if value not in (-1, 0, 1):
-            raise ValueError("Vote direction must be -1, 0, or 1.")
-        return value
+    delta: int = Field(ge=-2, le=2)

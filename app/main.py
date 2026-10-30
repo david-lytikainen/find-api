@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 import uvicorn
 
 from app.config import CORS_ORIGIN_LIST, engine
@@ -11,6 +12,8 @@ from app.routes import router
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    with engine.begin() as connection:
+        connection.execute(text("drop table if exists water_votes"))
     Base.metadata.create_all(bind=engine)
     yield
 

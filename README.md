@@ -1,6 +1,6 @@
 # FIND API
 
-FastAPI service for public water-location reports and per-browser-session votes.
+FastAPI service for public water-location reports and aggregate credibility updates.
 
 ## Run locally
 
@@ -13,4 +13,4 @@ cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
 
-The FastAPI lifespan creates the `water_reports` and `water_votes` tables. Reads use lowercase, parameterized SQL. The API returns at most the 10 nearest reports, with report distance calculated in meters. Reports within 30 feet are returned as possible duplicates when a new report is submitted.
+The FastAPI lifespan creates the `water_reports` table and removes the retired `water_votes` table. Reads use lowercase, parameterized SQL. The API returns at most the 10 nearest reports, with report distance calculated in meters. Reports within 30 feet are returned as possible duplicates when a new report is submitted. Vote direction stays in browser session storage; the API applies bounded credibility deltas without recording voter identity.
