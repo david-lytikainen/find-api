@@ -14,6 +14,9 @@ from app.routes import router
 async def lifespan(_: FastAPI):
     with engine.begin() as connection:
         connection.execute(text("drop table if exists water_votes"))
+        columns = {row["name"] for row in connection.execute(text("pragma table_info(water_reports)")).mappings()} if engine.dialect.name == "sqlite" else {row["column_name"] for row in connection.execute(text("select column_name from information_schema.columns where table_name = 'water_reports'")).mappings()}
+        if "credibility" in columns and "votes" not in columns:
+            connection.execute(text("alter table water_reports rename column credibility to votes"))
     Base.metadata.create_all(bind=engine)
     yield
 

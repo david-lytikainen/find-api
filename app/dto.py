@@ -21,3 +21,21 @@ class WaterReportInput(LocationInput):
 
 class VoteInput(BaseModel):
     delta: int = Field(ge=-2, le=2)
+
+
+class CommentInput(BaseModel):
+    report_id: int | None = Field(default=None, ge=1)
+    body: str = Field(min_length=1, max_length=500)
+
+    @field_validator("body")
+    @classmethod
+    def clean_body(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("Add a comment.")
+        return value
+
+
+class LoginInput(BaseModel):
+    email: str
+    password: str
