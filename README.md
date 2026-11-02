@@ -1,6 +1,6 @@
 # FIND API
 
-FastAPI service for public water-location reports, comments, aggregate votes, and admin moderation.
+FastAPI service for findable things, their locations, comments, aggregate votes, and admin management.
 
 ## Run locally
 
@@ -13,4 +13,4 @@ cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
 
-The FastAPI lifespan creates the `water_reports` and `comments` tables, renames the legacy report `credibility` column to `votes`, and removes the retired `water_votes` table. Reads use lowercase, parameterized SQL. The API returns at most the 10 nearest reports, with report distance calculated in meters. Reports within 30 feet are returned as possible duplicates when a new report is submitted. Report and comment vote direction stays in browser session storage; the API applies bounded vote deltas without recording voter identity. Comment pages contain 10 comments ordered by vote count descending, then oldest first. A nullable `report_id` identifies the homepage thread; report comments reference their report. Configure `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD`, and `JWT_SECRET` to enable admin login and comment deletion.
+The FastAPI lifespan creates `things`, `things_locations`, and `comments`. On the first startup after this schema change, it drops the old `water_reports` and `comments` tables; existing location and comment data is intentionally cleared. It removes the retired `water_votes` table and seeds Water as the first thing. Reads use lowercase, parameterized SQL. Public thing lists sort by Find clicks descending; locations return the 10 nearest entries for the selected thing. Locations within 30 feet are returned as possible duplicates when a new location is submitted. Location and comment vote direction stays in browser session storage; the API applies bounded vote deltas without recording voter identity. Comment pages contain 10 comments ordered by vote count descending, then oldest first. A nullable `report_id` identifies homepage comments; other comments reference a row in `things_locations`. Configure `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD`, and `JWT_SECRET` to enable admin sign-in, thing management, and comment deletion.

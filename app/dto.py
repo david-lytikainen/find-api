@@ -6,7 +6,7 @@ class LocationInput(BaseModel):
     longitude: float = Field(ge=-180, le=180)
 
 
-class WaterReportInput(LocationInput):
+class ThingLocationInput(LocationInput):
     force_duplicate: bool = False
     description: str = Field(min_length=1, max_length=30)
 
@@ -16,6 +16,19 @@ class WaterReportInput(LocationInput):
         value = value.strip()
         if not value:
             raise ValueError("Add a short description.")
+        return value
+
+
+class ThingInput(BaseModel):
+    name: str = Field(min_length=1, max_length=50)
+    archived: bool = False
+
+    @field_validator("name")
+    @classmethod
+    def clean_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("Add a name.")
         return value
 
 

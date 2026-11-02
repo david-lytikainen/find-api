@@ -14,10 +14,16 @@ from app.routes import router
 async def lifespan(_: FastAPI):
     with engine.begin() as connection:
         connection.execute(text("drop table if exists water_votes"))
-        columns = {row["name"] for row in connection.execute(text("pragma table_info(water_reports)")).mappings()} if engine.dialect.name == "sqlite" else {row["column_name"] for row in connection.execute(text("select column_name from information_schema.columns where table_name = 'water_reports'")).mappings()}
-        if "credibility" in columns and "votes" not in columns:
-            connection.execute(text("alter table water_reports rename column credibility to votes"))
+        if engine.dialect.name == "sqlite":
+            tables = {row["name"] for row in connection.execute(text("select name from sqlite_master where type = 'table'")).mappings()}
+        else:
+            tables = {row["table_name"] for row in connection.execute(text("select table_name from information_schema.tables where table_schema = current_schema()")).mappings()}
+        if "water_reports" in tables and "things_locations" not in tables:
+            connection.execute(text("drop table if exists comments"))
+            connection.execute(text("drop table water_reports"))
     Base.metadata.create_all(bind=engine)
+    with engine.begin() as connection:
+        connection.execute(text("insert into things (name) select 'Water' where not exists (select 1 from things where lower(name) = 'water')"))
     yield
 
 
